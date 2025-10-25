@@ -1,0 +1,36 @@
+FROM node:20-slim
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Copiar archivos de dependencias
+COPY package*.json ./
+
+# Instalar dependencias principales
+RUN npm cache clean --force && \
+    npm install --legacy-peer-deps
+
+# Instalar lightningcss específicamente para ARM64
+RUN npm install --no-save --force lightningcss-linux-arm64-gnu@latest || \
+    npm install --no-save --force @parcel/css-linux-arm64-gnu@latest || \
+    echo "Could not install native bindings, will use fallback"
+
+# Verificar instalación
+RUN ls -la node_modules/ | grep lightning || echo "lightningcss not found in node_modules"
+
+# Copiar el resto del código
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
