@@ -1,5 +1,5 @@
 // app/page.tsx
-import { getActivities, getMicrosites, getEvents, getBanners } from '@/lib/api';
+import { getActivities, getMicrosites, /*getEvents,*/ getBanners } from '@/lib/api';
 import { getStrapiImageUrl } from '@/lib/api/client';
 import Image from 'next/image';
 import Link from 'next/link';
