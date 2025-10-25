@@ -4,8 +4,15 @@ import { getStrapiImageUrl } from '@/lib/api/client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
-  Mountain, MapPin, Clock, Users, ArrowRight, Star, Calendar, Info, Compass, Wind 
+  Mountain, 
+  Clock, 
+  MapPin, 
+  ArrowRight,
+  Star
 } from 'lucide-react';
+
+// Add the types import
+import type { Activity, Microsite } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,12 +24,12 @@ export default async function Home() {
       getActivities({ limit: 6 }),
       getMicrosites({ featured: true, limit: 3 }),
       getEvents({ upcoming: true, limit: 3 }),
-      // getBanners('home-hero'),
+      getBanners('home-hero'),
     ]);
 
     const activities = activitiesRes.data || [];
     const microsites = micrositesRes.data || [];
-    const events = eventsRes.data || [];
+    //const events = eventsRes.data || [];
     // const banners = bannersRes?.data || [];
 
     return (
@@ -54,8 +61,10 @@ export default async function Home() {
             {activities.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                  {activities.map((activity) => (
-                    <ActivityCard key={activity.id} activity={activity} />
+                  {activities.map((activity: Activity) => (
+                    <div key={activity.id}>
+                      <ActivityCard activity={activity} />
+                    </div>
                   ))}
                 </div>
                 <div className="text-center">
@@ -98,8 +107,10 @@ export default async function Home() {
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {microsites.map((microsite) => (
-                  <MicrositeCard key={microsite.id} microsite={microsite} />
+                {microsites.map((microsite: Microsite) => (
+                  <div key={microsite.id}>
+                    <MicrositeCard microsite={microsite} />
+                  </div>
                 ))}
               </div>
             </div>
@@ -157,6 +168,15 @@ export default async function Home() {
       </div>
     );
   }
+}
+
+// =============== TYPES ===============
+interface ImageData {
+  data: {
+    attributes: {
+      url: string;
+    };
+  };
 }
 
 // =============== COMPONENTES ===============
@@ -397,7 +417,7 @@ function PracticalInfoSection() {
   );
 }
 
-function ActivityCard({ activity }: { activity: any }) {
+function ActivityCard({ activity }: { activity: Activity }) {
   const { attributes } = activity;
   const imageUrl = attributes?.featured_image?.data
     ? getStrapiImageUrl(attributes.featured_image.data.attributes.url)
@@ -464,7 +484,7 @@ function ActivityCard({ activity }: { activity: any }) {
   );
 }
 
-function MicrositeCard({ microsite }: { microsite: any }) {
+function MicrositeCard({ microsite }: { microsite: Microsite }) {
   const { attributes } = microsite;
   
   return (
