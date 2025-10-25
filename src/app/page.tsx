@@ -4,15 +4,8 @@ import { getStrapiImageUrl } from '@/lib/api/client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
-  Mountain, 
-  Clock, 
-  MapPin, 
-  ArrowRight,
-  Star
+  Mountain, MapPin, Clock, Users, ArrowRight, Star, Info, Compass, Wind 
 } from 'lucide-react';
-
-// Add the types import
-import type { Activity, Microsite } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,9 +55,7 @@ export default async function Home() {
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                   {activities.map((activity: Activity) => (
-                    <div key={activity.id}>
-                      <ActivityCard activity={activity} />
-                    </div>
+                    <ActivityCard key={activity.id} activity={activity} />
                   ))}
                 </div>
                 <div className="text-center">
@@ -108,9 +99,7 @@ export default async function Home() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {microsites.map((microsite: Microsite) => (
-                  <div key={microsite.id}>
-                    <MicrositeCard microsite={microsite} />
-                  </div>
+                  <MicrositeCard key={microsite.id} microsite={microsite} />
                 ))}
               </div>
             </div>
@@ -177,6 +166,55 @@ interface ImageData {
       url: string;
     };
   };
+}
+
+interface ActivityAttributes {
+  name: string;
+  slug: string;
+  description: string;
+  category?: 'deportes-agua' | 'montana' | 'aventura' | 'cultura' | 'pesca' | 'turismo';
+  difficulty?: 'facil' | 'moderado' | 'dificil' | 'experto';
+  duration?: number;
+  price_from?: number;
+  price_to?: number;
+  location?: string;
+  highlights?: any;
+  included?: string;
+  requirements?: string;
+  published?: boolean;
+  featured_image?: ImageData;
+  gallery?: ImageData[];
+}
+
+interface Activity {
+  id: number;
+  attributes: ActivityAttributes;
+}
+
+interface MicrositeAttributes {
+  name: string;
+  slug: string;
+  description: string;
+  subscription_plan?: 'basico' | 'premium';
+  theme_color?: string;
+  contact_email: string;
+  contact_phone?: string;
+  whatsapp?: string;
+  facebook?: string;
+  instagram?: string;
+  website?: string;
+  address?: string;
+  location?: string;
+  is_active?: boolean;
+  featured?: boolean;
+  custom_pages?: any;
+  logo?: ImageData;
+  cover_image?: ImageData[];
+}
+
+interface Microsite {
+  id: number;
+  attributes: MicrositeAttributes;
 }
 
 // =============== COMPONENTES ===============
