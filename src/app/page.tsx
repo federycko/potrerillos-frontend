@@ -13,22 +13,20 @@ export default async function Home() {
   try {
     // Nota: getBanners está importado pero no usado en la versión original.
     // Si decides usarlo en HeroSection, descomenta la línea de abajo.
-    const [activitiesRes, micrositesRes, eventsRes /*, bannersRes */] = await Promise.all([
+    const [activitiesRes, micrositesRes, bannersRes] = await Promise.all([
       getActivities({ limit: 6 }),
       getMicrosites({ featured: true, limit: 3 }),
-      getEvents({ upcoming: true, limit: 3 }),
       getBanners('home-hero'),
     ]);
 
     const activities = activitiesRes.data || [];
     const microsites = micrositesRes.data || [];
-    //const events = eventsRes.data || [];
-    // const banners = bannersRes?.data || [];
+    const banners = bannersRes?.data || [];
 
     return (
       <div className="min-h-screen bg-stone-50">
         {/* Hero Full Height */}
-        <HeroSection /* banner={banners[0]} */ />
+        <HeroSection banner={banners[0]} />
 
         {/* Stats Bar */}
         <StatsBar />
@@ -178,7 +176,7 @@ interface ActivityAttributes {
   price_from?: number;
   price_to?: number;
   location?: string;
-  highlights?: any;
+  highlights?: Array<{ title: string; description: string }> | null;
   included?: string;
   requirements?: string;
   published?: boolean;
@@ -207,7 +205,7 @@ interface MicrositeAttributes {
   location?: string;
   is_active?: boolean;
   featured?: boolean;
-  custom_pages?: any;
+  custom_pages?: Array<{ title: string; content: string }> | null;
   logo?: ImageData;
   cover_image?: ImageData[];
 }
@@ -219,7 +217,7 @@ interface Microsite {
 
 // =============== COMPONENTES ===============
 
-function HeroSection(/* { banner }: { banner?: any } */) {
+function HeroSection({ banner }: { banner?: any }) {
   return (
     <div className="relative h-screen min-h-[700px]">
       <div className="absolute inset-0 bg-stone-900">
