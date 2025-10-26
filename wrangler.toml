@@ -1,0 +1,17 @@
+name = "potrerillos-frontend"
+main = "./out/_worker.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[site]
+bucket = "./out"
+
+[build]
+command = "./build-cf.sh"
+watch_dir = "./src"
+
+[env.production]
+[env.production.build]
+command = "./build-cf.sh"
+
+pages_build_output_dir = "./out"

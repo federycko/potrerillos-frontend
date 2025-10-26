@@ -42,6 +42,15 @@ Make sure to set these environment variables in your Cloudflare Pages project:
 - `NEXT_PUBLIC_API_URL`: The URL to your Strapi API (e.g., `https://your-strapi-api.com/api`)
 - `NEXT_PUBLIC_STRAPI_URL`: The base URL to your Strapi instance (e.g., `https://your-strapi-api.com`)
 
+## Configuration Files
+
+We've included several configuration files to optimize the deployment:
+
+1. `wrangler.toml` - Configuration for Wrangler CLI
+2. `public/_headers` - Custom headers for security and performance
+3. `public/_redirects` - Redirects for client-side routing
+4. `out/_worker.js` - Worker script for handling routing
+
 ## Troubleshooting
 
 ### Bundle Size Issues

@@ -1,9 +1,8 @@
 {
   "name": "potrerillos-frontend",
-  "main": "out/index.js",
+  "main": "./out/_worker.js",
   "site": {
-    "bucket": "./out",
-    "entry-point": "."
+    "bucket": "./out"
   },
   "build": {
     "command": "./build-cf.sh",
