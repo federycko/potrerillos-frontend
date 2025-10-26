@@ -47,111 +47,71 @@ Después de iniciar los contenedores:
 |----------|-----|--------|-------------|
 | **Frontend** | http://localhost:3001 | 3001 | Aplicación Next.js |
 
-## 🔧 Comandos útiles
+## 🧪 Comandos Disponibles
 
 ```bash
-# Iniciar servicios
-docker-compose up -d
-
-# Detener servicios
-docker-compose down
-
-# Ver logs
-docker-compose logs -f
-
-# Reconstruir contenedores
-docker-compose build --no-cache
-
-# Reiniciar un servicio
-docker-compose restart
-
-# Acceder a la shell de un contenedor
-docker exec -it potrerillos_nextjs sh
+npm run dev       # Iniciar servidor de desarrollo
+npm run build     # Construir aplicación para producción
+npm run start     # Iniciar servidor de producción
+npm run lint      # Ejecutar linter
 ```
 
-## 📂 Estructura del proyecto
+## 📁 Estructura del Proyecto
 
 ```
 potrerillos-frontend/
-├── src/                  # Código fuente del frontend
-│   ├── app/              # Componentes de página
-│   ├── components/       # Componentes reutilizables
-│   └── lib/              # Librerías y utilidades
+├── src/
+│   ├── app/              # App Router (páginas)
+│   ├── components/       # Componentes React
+│   ├── lib/              # Librerías y utilidades
+│   └── types/            # Definiciones de tipos TypeScript
 ├── public/               # Archivos estáticos
-├── Dockerfile            # Dockerfile para producción
-├── Dockerfile.dev        # Dockerfile para desarrollo
-├── docker-compose.yml    # Orquestación de contenedores
-├── next.config.ts        # Configuración de Next.js
-├── package.json          # Dependencias y scripts
-├── .env                  # Variables de entorno
-└── README.md
+├── .env.example          # Variables de entorno de ejemplo
+├── docker-compose.yml    # Configuración Docker
+└── Dockerfile            # Imagen Docker de producción
 ```
 
-## 🚀 Deployment en Producción
+## ☁️ Despliegue en Cloudflare Pages
 
-### Opción 1: Docker
+Para desplegar en Cloudflare Pages, hemos optimizado el proyecto para reducir el tamaño del bundle y cumplir con el límite de 25MB.
 
-1. Copiar el repositorio:
-```bash
-git clone https://github.com/tu-usuario/potrerillos-frontend.git
-cd potrerillos-frontend
-```
+### Optimizaciones implementadas:
 
-2. Configurar variables de entorno:
-```bash
-cp .env.production.example .env.production
-# Editar .env.production con tus valores de producción
-```
+1. **Exportación estática** - La aplicación se construye como un sitio estático
+2. **Reemplazo de React por Preact** - Reducción significativa del tamaño del bundle
+3. **Optimización de imágenes** - Las imágenes se sirven estáticamente sin optimización del servidor
+4. **Optimización de importaciones** - Solo se importan las partes necesarias de los paquetes
 
-3. Construir y ejecutar con Docker:
-```bash
-# Construir imagen
-docker build -t potrerillos-frontend .
+### Pasos para el despliegue:
 
-# Ejecutar contenedor
-docker run -d \
-  --name potrerillos-frontend \
-  --env-file .env.production \
-  -p 3000:3000 \
-  potrerillos-frontend
-```
+1. Conecta tu repositorio GitHub a Cloudflare Pages
+2. Configura los ajustes de compilación:
+   - Comando de compilación: `./build-cf.sh`
+   - Directorio de salida: `out`
+3. Agrega las variables de entorno:
+   - `NEXT_PUBLIC_API_URL`: URL de tu API Strapi
+   - `NEXT_PUBLIC_STRAPI_URL`: URL base de tu instancia Strapi
 
-### Opción 2: Cloudflare Pages (Recomendado)
+### Variables de entorno requeridas:
 
-1. En el dashboard de Cloudflare Pages:
-   - Conecta tu repositorio de GitHub
-   - Selecciona el repositorio `potrerillos-frontend`
-   - Configura las variables de entorno en "Environment Variables"
-   - Configura el comando de build: `npm run build`
-   - Directorio de salida: `.next`
+- `NEXT_PUBLIC_API_URL`: La URL a tu API Strapi (ej. `https://tu-strapi-api.com/api`)
+- `NEXT_PUBLIC_STRAPI_URL`: La URL base a tu instancia Strapi (ej. `https://tu-strapi-api.com`)
 
-2. Configuración adicional en Cloudflare Pages:
-   - Framework preset: Next.js
-   - Build command: `npm run build`
-   - Build output directory: `.next`
-   - Environment variables:
-     - NEXT_PUBLIC_API_URL: `https://your-api-domain.com/api`
-     - NEXT_PUBLIC_STRAPI_URL: `https://your-api-domain.com`
-     - NEXT_PUBLIC_SITE_URL: `https://your-frontend-domain.com`
+### Solución de problemas:
 
-## 🔒 Configuración de producción
+Si aún encuentras problemas con el tamaño del bundle:
 
-Para producción, asegúrate de:
+1. Revisa las dependencias grandes:
+   ```bash
+   npm run build && du -sh .next/static/chunks/* | sort -hr
+   ```
 
-1. Actualizar las URLs de la API en las variables de entorno
-2. Configurar dominios personalizados
-3. Configurar SSL si es necesario
+2. Analiza el bundle:
+   ```bash
+   npx @next/bundle-analyzer
+   ```
 
-## 🐛 Troubleshooting
-
-### Los cambios no se reflejan
-```bash
-# Next.js usa polling en Docker
-# Verificar que WATCHPACK_POLLING=true esté en docker-compose.yml
-
-# Reiniciar el servicio
-docker-compose restart
-```
+Para más detalles, consulta el archivo [README-CLOUDFLARE.md](README-CLOUDFLARE.md)
 
 ## 📝 Notas de desarrollo
 
@@ -159,18 +119,20 @@ docker-compose restart
 - `node_modules` se gestiona dentro del contenedor
 - La aplicación escucha en el puerto 3000 dentro del contenedor
 
-## 🤝 Contribuir
+## 🤝 Contribución
 
-1. Fork el proyecto
+1. Haz un fork del proyecto
 2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
+3. Haz commit de tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Haz push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT.
+Ver archivo [LICENSE](LICENSE) para más información.
 
-## 👥 Contacto
+## 📞 Contacto
 
-Proyecto Dique Potrerillos - [@tu-usuario](https://github.com/tu-usuario)
+Tu Nombre - [@tu_usuario](https://twitter.com/tu_usuario) - tu.email@ejemplo.com
+
+Enlace del Proyecto: [https://github.com/tu-usuario/potrerillos-frontend](https://github.com/tu-usuario/potrerillos-frontend)

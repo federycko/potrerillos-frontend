@@ -1,0 +1,22 @@
+{
+  "name": "potrerillos-frontend",
+  "main": "out/index.js",
+  "site": {
+    "bucket": "./out",
+    "entry-point": "."
+  },
+  "build": {
+    "command": "./build-cf.sh",
+    "watch_dir": "./src"
+  },
+  "env": {
+    "production": {
+      "build": {
+        "command": "./build-cf.sh"
+      }
+    }
+  },
+  "compatibility_date": "2024-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": "./out"
+}
