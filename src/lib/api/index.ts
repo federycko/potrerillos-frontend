@@ -1,6 +1,6 @@
 import apiClient from './client';
 import type {
-  StrapiResponse,
+  StrapiResponseCollection,
   StrapiEntity,
   Activity,
   Accommodation,
@@ -8,14 +8,14 @@ import type {
   Event,
   Section,
   Banner,
-} from '@/types';
+} from '../../types';
 
 // Activities
 export const getActivities = async (params?: {
   category?: string;
   difficulty?: string;
   limit?: number;
-}): Promise<StrapiResponse<StrapiEntity<Activity>[]>> => {
+}): Promise<StrapiResponseCollection<Activity>> => {
   try {
     const queryParams = new URLSearchParams();
     queryParams.append('populate', '*');
@@ -30,17 +30,17 @@ export const getActivities = async (params?: {
       queryParams.append('pagination[pageSize]', params.limit.toString());
     }
 
-    const { data } = await apiClient.get(`/activities?${queryParams.toString()}`);
+    const { data } = await apiClient.get<StrapiResponseCollection<Activity>>(`/activities?${queryParams.toString()}`);
     return data;
   } catch (error) {
     console.error('Error fetching activities:', error);
-    return { data: [], meta: {} };
+    return { data: [], meta: { pagination: { page: 1, pageSize: 10, pageCount: 1, total: 0 } } };
   }
 };
 
 export const getActivity = async (slug: string): Promise<StrapiEntity<Activity> | null> => {
   try {
-    const { data } = await apiClient.get(
+    const { data } = await apiClient.get<StrapiResponseCollection<Activity>>(
       `/activities?filters[slug][$eq]=${slug}&populate=*`
     );
     return data.data[0] || null;
@@ -54,7 +54,7 @@ export const getActivity = async (slug: string): Promise<StrapiEntity<Activity> 
 export const getAccommodations = async (params?: {
   type?: string;
   limit?: number;
-}): Promise<StrapiResponse<StrapiEntity<Accommodation>[]>> => {
+}): Promise<StrapiResponseCollection<Accommodation>> => {
   try {
     const queryParams = new URLSearchParams();
     queryParams.append('populate', '*');
@@ -66,17 +66,17 @@ export const getAccommodations = async (params?: {
       queryParams.append('pagination[pageSize]', params.limit.toString());
     }
 
-    const { data } = await apiClient.get(`/accommodations?${queryParams.toString()}`);
+    const { data } = await apiClient.get<StrapiResponseCollection<Accommodation>>(`/accommodations?${queryParams.toString()}`);
     return data;
   } catch (error) {
     console.error('Error fetching accommodations:', error);
-    return { data: [], meta: {} };
+    return { data: [], meta: { pagination: { page: 1, pageSize: 10, pageCount: 1, total: 0 } } };
   }
 };
 
 export const getAccommodation = async (slug: string): Promise<StrapiEntity<Accommodation> | null> => {
   try {
-    const { data } = await apiClient.get(
+    const { data } = await apiClient.get<StrapiResponseCollection<Accommodation>>(
       `/accommodations?filters[slug][$eq]=${slug}&populate=*`
     );
     return data.data[0] || null;
@@ -90,7 +90,7 @@ export const getAccommodation = async (slug: string): Promise<StrapiEntity<Accom
 export const getMicrosites = async (params?: {
   featured?: boolean;
   limit?: number;
-}): Promise<StrapiResponse<StrapiEntity<Microsite>[]>> => {
+}): Promise<StrapiResponseCollection<Microsite>> => {
   try {
     const queryParams = new URLSearchParams();
     queryParams.append('populate', '*');
@@ -102,17 +102,17 @@ export const getMicrosites = async (params?: {
       queryParams.append('pagination[pageSize]', params.limit.toString());
     }
 
-    const { data } = await apiClient.get(`/microsites?${queryParams.toString()}`);
+    const { data } = await apiClient.get<StrapiResponseCollection<Microsite>>(`/microsites?${queryParams.toString()}`);
     return data;
   } catch (error) {
     console.error('Error fetching microsites:', error);
-    return { data: [], meta: {} };
+    return { data: [], meta: { pagination: { page: 1, pageSize: 10, pageCount: 1, total: 0 } } };
   }
 };
 
 export const getMicrosite = async (slug: string): Promise<StrapiEntity<Microsite> | null> => {
   try {
-    const { data } = await apiClient.get(
+    const { data } = await apiClient.get<StrapiResponseCollection<Microsite>>(
       `/microsites?filters[slug][$eq]=${slug}&populate=*`
     );
     return data.data[0] || null;
@@ -123,34 +123,22 @@ export const getMicrosite = async (slug: string): Promise<StrapiEntity<Microsite
 };
 
 // Events
-export const getEvents = async (params?: {
-  upcoming?: boolean;
-  limit?: number;
-}): Promise<StrapiResponse<StrapiEntity<Event>[]>> => {
+export const getEvents = async (): Promise<StrapiResponseCollection<Event>> => {
   try {
     const queryParams = new URLSearchParams();
     queryParams.append('populate', '*');
-    
-    if (params?.upcoming) {
-      const now = new Date().toISOString();
-      queryParams.append('filters[event_date][$gte]', now);
-      queryParams.append('sort', 'event_date:asc');
-    }
-    if (params?.limit) {
-      queryParams.append('pagination[pageSize]', params.limit.toString());
-    }
 
-    const { data } = await apiClient.get(`/events?${queryParams.toString()}`);
+    const { data } = await apiClient.get<StrapiResponseCollection<Event>>(`/events?${queryParams.toString()}`);
     return data;
   } catch (error) {
     console.error('Error fetching events:', error);
-    return { data: [], meta: {} };
+    return { data: [], meta: { pagination: { page: 1, pageSize: 10, pageCount: 1, total: 0 } } };
   }
 };
 
 export const getEvent = async (slug: string): Promise<StrapiEntity<Event> | null> => {
   try {
-    const { data } = await apiClient.get(
+    const { data } = await apiClient.get<StrapiResponseCollection<Event>>(
       `/events?filters[slug][$eq]=${slug}&populate=*`
     );
     return data.data[0] || null;
@@ -161,50 +149,31 @@ export const getEvent = async (slug: string): Promise<StrapiEntity<Event> | null
 };
 
 // Sections
-export const getSections = async (): Promise<StrapiResponse<StrapiEntity<Section>[]>> => {
+export const getSections = async (): Promise<StrapiResponseCollection<Section>> => {
   try {
-    const { data } = await apiClient.get('/sections?populate=*&sort=order:asc');
+    const queryParams = new URLSearchParams();
+    queryParams.append('populate', '*');
+    queryParams.append('sort', 'order:asc');
+
+    const { data } = await apiClient.get<StrapiResponseCollection<Section>>(`/sections?${queryParams.toString()}`);
     return data;
   } catch (error) {
     console.error('Error fetching sections:', error);
-    return { data: [], meta: {} };
-  }
-};
-
-export const getSection = async (slug: string): Promise<StrapiEntity<Section> | null> => {
-  try {
-    const { data } = await apiClient.get(
-      `/sections?filters[slug][$eq]=${slug}&populate=*`
-    );
-    return data.data[0] || null;
-  } catch (error) {
-    console.error('Error fetching section:', error);
-    return null;
+    return { data: [], meta: { pagination: { page: 1, pageSize: 10, pageCount: 1, total: 0 } } };
   }
 };
 
 // Banners
-export const getBanners = async (placement?: string): Promise<StrapiResponse<StrapiEntity<Banner>[]>> => {
+export const getBanners = async (): Promise<StrapiResponseCollection<Banner>> => {
   try {
     const queryParams = new URLSearchParams();
     queryParams.append('populate', '*');
-    queryParams.append('filters[is_active][$eq]', 'true');
-    
-    const now = new Date().toISOString();
-    queryParams.append('filters[start_date][$lte]', now);
-    queryParams.append('filters[end_date][$gte]', now);
-    
-    if (placement) {
-      queryParams.append('filters[placement][$eq]', placement);
-    }
-    
-    queryParams.append('sort', 'priority:desc');
 
-    const { data } = await apiClient.get(`/banners?${queryParams.toString()}`);
+    const { data } = await apiClient.get<StrapiResponseCollection<Banner>>(`/banners?${queryParams.toString()}`);
     return data;
   } catch (error) {
     console.error('Error fetching banners:', error);
-    return { data: [], meta: {} };
+    return { data: [], meta: { pagination: { page: 1, pageSize: 10, pageCount: 1, total: 0 } } };
   }
 };
 
