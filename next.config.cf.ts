@@ -41,13 +41,7 @@ const nextConfig: NextConfig = {
     
     return config;
   },
-  
-  /**
-   * Optimize fonts for static export
-   */
-  experimental: {
-    optimizePackageImports: ['lucide-react'],
-  },
+
 };
 
 export default nextConfig;
