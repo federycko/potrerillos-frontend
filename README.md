@@ -63,9 +63,8 @@ Para desplegar en Cloudflare Pages, hemos optimizado el proyecto para reducir el
 ### Optimizaciones implementadas:
 
 1. **Exportación estática** - La aplicación se construye como un sitio estático
-2. **Reemplazo de React por Preact** - Reducción significativa del tamaño del bundle
-3. **Optimización de imágenes** - Las imágenes se sirven estáticamente sin optimización del servidor
-4. **Optimización de importaciones** - Solo se importan las partes necesarias de los paquetes
+2. **Optimización de imágenes** - Las imágenes se sirven estáticamente sin optimización del servidor
+3. **Optimización de importaciones** - Solo se importan las partes necesarias de los paquetes
 
 ### Pasos para el despliegue:
 
@@ -87,6 +86,7 @@ Para desplegar en Cloudflare Pages, hemos optimizado el proyecto para reducir el
 1. `public/_routes.json` - Define qué rutas deben ser manejadas por Cloudflare Pages
 2. `public/_headers` - Encabezados personalizados para seguridad y rendimiento
 3. `public/_redirects` - Redirecciones para enrutamiento del lado del cliente
+4. `wrangler.json` - Configuración para Cloudflare Pages
 
 ### Solución de problemas:
 
@@ -102,7 +102,7 @@ Si aún encuentras problemas con el tamaño del bundle:
    npx @next/bundle-analyzer
    ```
 
-Para más detalles, consulta el archivo [README-CLOUDFLARE.md](README-CLOUDFLARE.md).
+Para más detalles, consulta el archivo [README-CLOUDFLARE.md](README-CLOUDFLARE.md)
 
 ## 📁 Estructura del Proyecto
 

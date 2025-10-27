@@ -8,8 +8,8 @@ rm -rf .next out
 npm ci
 
 # Build the static export
+# Since next.config.ts already has output: "export", we don't need next export
 npm run build
-npx next export
 
 # Output directory verification
 if [ -d "out" ]; then
