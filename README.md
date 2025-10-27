@@ -39,36 +39,21 @@ docker-compose ps
 docker-compose logs -f
 ```
 
-## 🌐 Acceso al servicio
-
-Después de iniciar los contenedores:
-
-| Servicio | URL | Puerto | Descripción |
-|----------|-----|--------|-------------|
-| **Frontend** | http://localhost:3001 | 3001 | Aplicación Next.js |
-
-## 🧪 Comandos Disponibles
-
+### Sin Docker (desarrollo)
 ```bash
-npm run dev       # Iniciar servidor de desarrollo
-npm run build     # Construir aplicación para producción
-npm run start     # Iniciar servidor de producción
-npm run lint      # Ejecutar linter
-```
+# 1. Clonar repositorio
+git clone https://github.com/tu-usuario/potrerillos-frontend.git
+cd potrerillos-frontend
 
-## 📁 Estructura del Proyecto
+# 2. Instalar dependencias
+npm install
 
-```
-potrerillos-frontend/
-├── src/
-│   ├── app/              # App Router (páginas)
-│   ├── components/       # Componentes React
-│   ├── lib/              # Librerías y utilidades
-│   └── types/            # Definiciones de tipos TypeScript
-├── public/               # Archivos estáticos
-├── .env.example          # Variables de entorno de ejemplo
-├── docker-compose.yml    # Configuración Docker
-└── Dockerfile            # Imagen Docker de producción
+# 3. Copiar archivo de entorno y editar
+cp .env.example .env
+nano .env
+
+# 4. Iniciar servidor de desarrollo
+npm run dev
 ```
 
 ## ☁️ Despliegue en Cloudflare Pages
@@ -97,6 +82,12 @@ Para desplegar en Cloudflare Pages, hemos optimizado el proyecto para reducir el
 - `NEXT_PUBLIC_API_URL`: La URL a tu API Strapi (ej. `https://tu-strapi-api.com/api`)
 - `NEXT_PUBLIC_STRAPI_URL`: La URL base a tu instancia Strapi (ej. `https://tu-strapi-api.com`)
 
+### Archivos de configuración de Cloudflare Pages:
+
+1. `public/_routes.json` - Define qué rutas deben ser manejadas por Cloudflare Pages
+2. `public/_headers` - Encabezados personalizados para seguridad y rendimiento
+3. `public/_redirects` - Redirecciones para enrutamiento del lado del cliente
+
 ### Solución de problemas:
 
 Si aún encuentras problemas con el tamaño del bundle:
@@ -111,13 +102,54 @@ Si aún encuentras problemas con el tamaño del bundle:
    npx @next/bundle-analyzer
    ```
 
-Para más detalles, consulta el archivo [README-CLOUDFLARE.md](README-CLOUDFLARE.md)
+Para más detalles, consulta el archivo [README-CLOUDFLARE.md](README-CLOUDFLARE.md).
 
-## 📝 Notas de desarrollo
+## 📁 Estructura del Proyecto
 
-- Los volúmenes de desarrollo están montados para hot-reload
-- `node_modules` se gestiona dentro del contenedor
-- La aplicación escucha en el puerto 3000 dentro del contenedor
+```
+potrerillos-frontend/
+├── src/
+│   ├── app/              # App Router (páginas)
+│   ├── components/       # Componentes React
+│   ├── lib/              # Librerías y utilidades
+│   └── types/            # Definiciones de tipos TypeScript
+├── public/               # Archivos estáticos
+├── .env.example          # Variables de entorno de ejemplo
+├── docker-compose.yml    # Configuración Docker
+└── Dockerfile            # Imagen Docker de producción
+```
+
+## 🧪 Comandos Disponibles
+
+```bash
+npm run dev       # Iniciar servidor de desarrollo
+npm run build     # Construir aplicación para producción
+npm run start     # Iniciar servidor de producción
+npm run lint      # Ejecutar linter
+```
+
+## 🐳 Docker
+
+### Construir imagen de producción
+```bash
+docker build -t potrerillos-frontend .
+```
+
+### Ejecutar contenedor
+```bash
+docker run -p 3000:3000 potrerillos-frontend
+```
+
+## 🔧 Configuración
+
+### Variables de Entorno
+Copia `.env.example` a `.env` y ajusta los valores:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:1337/api
+NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
 
 ## 🤝 Contribución
 

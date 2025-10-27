@@ -7,8 +7,9 @@ import {
   Mountain, MapPin, Clock, ArrowRight, Star, Info, Compass, Wind 
 } from 'lucide-react';
 import type { StrapiEntity, Activity, Microsite } from '@/types';
+import ErrorComponent from '@/components/layout/ErrorComponent';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'error';
 
 // Helper components
 function HeroSection() {
@@ -171,7 +172,7 @@ export default async function Home() {
               {activities.slice(0, 6).map((activity) => (
                 <div key={activity.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <div className="relative h-56">
-                    {activity.attributes.featured_image ? (
+                    {activity.attributes.featured_image?.attributes ? (
                       <Image
                         src={getStrapiImageUrl(activity.attributes.featured_image.attributes.url)}
                         alt={activity.attributes.name}
@@ -262,7 +263,7 @@ export default async function Home() {
               {microsites.slice(0, 3).map((microsite) => (
                 <div key={microsite.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <div className="relative h-48">
-                    {microsite.attributes.image ? (
+                    {microsite.attributes.image?.attributes ? (
                       <Image
                         src={getStrapiImageUrl(microsite.attributes.image.attributes.url)}
                         alt={microsite.attributes.title}
@@ -330,19 +331,6 @@ export default async function Home() {
     );
   } catch (error) {
     console.error("Error loading homepage:", error);
-    return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-stone-900 mb-4">Oops! Algo salió mal</h2>
-          <p className="text-stone-600 mb-6">No pudimos cargar el contenido principal.</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
-          >
-            Reintentar
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorComponent />;
   }
 }

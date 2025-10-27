@@ -34,23 +34,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
-  
-  /**
-   * Reduce bundle size by removing unused locales
-   */
-  webpack: (config, { dev, isServer }) => {
-    // Replace React with Preact in production
-    if (!dev && !isServer) {
-      Object.assign(config.resolve.alias, {
-        'react/jsx-runtime': 'preact/jsx-runtime',
-        'react': 'preact/compat',
-        'react-dom/test-utils': 'preact/test-utils',
-        'react-dom': 'preact/compat',
-      });
-    }
-    
-    return config;
-  },
 };
 
 export default nextConfig;
