@@ -9,7 +9,7 @@ export const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
+console.log('API Base URL:', process.env.NEXT_PUBLIC_API_URL);
 // Helper para construir URLs de imágenes
 export const getStrapiImageUrl = (url: string | undefined): string => {
   if (!url) return '/placeholder.jpg';
