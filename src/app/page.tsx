@@ -14,8 +14,8 @@ export default async function Home() {
     const [activitiesRes, micrositesRes, eventsRes, bannersRes, welcomeRes] = await Promise.all([
       getActivities({ limit: 6 }),
       getMicrosites({ featured: true, limit: 3 }),
-      getEvents({ upcoming: true, limit: 3 }),
-      getBanners('home-hero'),
+      getEvents(),
+      getBanners(),
       getWelcomeSection(),
     ]);
 
