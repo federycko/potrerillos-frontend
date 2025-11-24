@@ -160,3 +160,36 @@ export interface Banner {
   updatedAt: string;
   publishedAt: string;
 }
+
+export interface WelcomeSection {
+
+    title: string;
+    subtitle: string;
+    description: string;
+    backgroundImage: Array<{
+      id: number;
+      documentId: string;
+      url: string;
+      alternativeText: string;
+      width: number;
+    }>;
+    ctaButton?: {
+      id: number;
+      text: string;
+      link: string;
+      style: 'primary' | 'secondary' | 'outline';
+    };
+    highlights?: Array<{
+      id: number;
+      icon: string;
+      title: string;
+      description: string;
+    }>;
+    active: boolean;
+}
+
+export interface WelcomeSectionResponse {
+  data: WelcomeSection | null;
+  meta: Record<string, unknown>;
+
+}

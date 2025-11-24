@@ -3,6 +3,8 @@ import axios from 'axios';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337/api';
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 
+
+
 export const apiClient = axios.create({
   baseURL: API_URL,
   headers: {

@@ -1,39 +1,61 @@
-import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  /**
-   * Enable static exports for the App Router.
-   *
-   * @see https://nextjs.org/docs/app/building-your-application/deploying/static-exports
-   */
-  output: "export",
 
-  /**
-   * Set base path. This is usually the slug of your repository.
-   *
-   * @see https://nextjs.org/docs/app/api-reference/next-config-js/basePath
-   */
-  // basePath: "/cms-diquepotrerillos",
 
-  /**
-   * Disable server-based image optimization. Using { unoptimized: true } in
-   * the image component export options will still work.
-   *
-   * @see https://nextjs.org/docs/app/api-reference/components/image#unoptimized
-   *
-   * If you want to use image optimization, you can remove this option.
-   */
-  images: {
-    unoptimized: true,
-  },
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // ❌ Removido output: 'export' para permitir renderizado dinámico
   
-  /**
-   * Enable standalone build mode to reduce bundle size
-   * @see https://nextjs.org/docs/app/api-reference/next-config-js/output
-   */
-  experimental: {
-    optimizePackageImports: ['lucide-react'],
+  // Configuración de imágenes para Strapi
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '1337',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'strapi', // Nombre del servicio Docker
+        port: '1337',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'entrance-everyday-cooperative-islands.trycloudflare.com',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'diquepotrerillos.com.ar', // Cambia por tu dominio real
+        pathname: '/uploads/**',
+      },
+    ],
   },
-};
 
-export default nextConfig;
+  // Variables de entorno públicas
+  env: {
+    NEXT_PUBLIC_STRAPI_URL: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
+  },
+
+  // Configuración de producción
+  reactStrictMode: true,
+  
+  // Optimizaciones
+  poweredByHeader: false,
+  
+  // Compresión
+  compress: true,
+
+  // Configuración de rewrites si necesitas proxy a Strapi
+  async rewrites() {
+    return [
+      {
+        source: '/api/strapi/:path*',
+        destination: `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/:path*`,
+      },
+    ]
+  },
+}
+
+module.exports = nextConfig

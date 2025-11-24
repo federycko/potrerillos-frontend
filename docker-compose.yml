@@ -10,9 +10,9 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: ${PORT:-3000}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337/api}
-      NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL:-http://localhost:1337}
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://strapi:1337/api}
+      NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL:-http://strapi:1337}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3001}
       WATCHPACK_POLLING: true
       CHOKIDAR_USEPOLLING: true
     ports:
@@ -22,8 +22,9 @@ services:
       - /app/node_modules
       - /app/.next
     networks:
-      - potrerillos_network
+      - potrerillos-network
 
 networks:
-  potrerillos_network:
-    driver: bridge
+  potrerillos-network:
+    external: true
+    name: potrerillos-network

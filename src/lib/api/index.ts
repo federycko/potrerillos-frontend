@@ -8,6 +8,7 @@ import type {
   Event,
   Section,
   Banner,
+  WelcomeSectionResponse
 } from '../../types';
 
 // Activities
@@ -187,3 +188,27 @@ export const getInformation = async () => {
     return null;
   }
 };
+
+
+// lib/api/welcome.ts
+
+
+
+
+export async function getWelcomeSection(locale: string = 'es'): Promise<WelcomeSectionResponse | null> {
+  try {
+    const { data } = await apiClient.get<WelcomeSectionResponse>(
+      `/welcome-section?locale=${locale}&populate[backgroundImage][fields][0]=url&populate[backgroundImage][fields][1]=alternativeText&populate[backgroundImage][fields][2]=width&populate[backgroundImage][fields][3]=height&populate[ctaButton]=*&populate[highlights]=*`
+    );
+    console.log('Welcome Section Data:', data);
+    // Check if section is active
+    if (data?.active === false) {
+      return null;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching welcome section:', error);
+    return null;
+  }
+}

@@ -1,328 +1,141 @@
-// app/page.tsx
-import { getActivities, getMicrosites } from '@/lib/api';
+import { getActivities, getMicrosites, getEvents, getBanners, getWelcomeSection } from '@/lib/api';
 import { getStrapiImageUrl } from '@/lib/api/client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  Mountain, MapPin, Clock, ArrowRight, Star, Info, Compass, Wind 
-} from 'lucide-react';
-import type { StrapiEntity, Activity, Microsite } from '@/types';
-import ErrorComponent from '@/components/layout/ErrorComponent';
+import WelcomeSection  from '@/components/WelcomeSection';
+import { Mountain, MapPin, Clock, DollarSign, Calendar, ArrowRight, Star } from 'lucide-react';
 
-export const dynamic = 'error';
-
-// Helper components
-function HeroSection() {
-  return (
-    <div className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* Background image */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/hero-bg.jpg"
-          alt="Dique Potrerillos"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-      </div>
-      
-      {/* Content */}
-      <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-        <h1 className="text-5xl md:text-7xl font-bold mb-6">
-          Descubre <span className="text-emerald-400">Potrerillos</span>
-        </h1>
-        <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto">
-          Un oasis de naturaleza, deportes y tranquilidad en el corazón de Mendoza
-        </p>
-        <Link 
-          href="#actividades" 
-          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
-        >
-          Explorar Experiencias
-          <ArrowRight className="w-5 h-5" />
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-function StatsBar() {
-  const stats = [
-    { number: "15m³/s", label: "Caudal del río" },
-    { number: "10km²", label: "Espejo de agua" },
-    { number: "20°C", label: "Temperatura media" },
-    { number: "365", label: "Días de sol al año" },
-  ];
-
-  return (
-    <div className="bg-white py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, index) => (
-            <div key={index} className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-emerald-700 mb-2">
-                {stat.number}
-              </div>
-              <div className="text-stone-600">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function AboutSection() {
-  return (
-    <section className="py-20 bg-stone-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <span className="text-emerald-700 font-semibold text-sm uppercase tracking-wider">
-              Bienvenidos a Potrerillos
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mt-2 mb-6">
-              Donde la naturaleza encuentra su equilibrio
-            </h2>
-            <p className="text-lg text-stone-700 mb-6">
-              Ubicado a solo 45 minutos de la ciudad de Mendoza, el dique Potrerillos es uno de los embalses más importantes de la región. Con sus aguas cristalinas, playas de arena fina y espectaculares paisajes serranos, ofrece un refugio perfecto para quienes buscan conectar con la naturaleza.
-            </p>
-            <p className="text-lg text-stone-700 mb-8">
-              Desde deportes náuticos hasta senderismo en las sierras, pasando por observación de flora y fauna autóctona, nuestro destino promete experiencias únicas para toda la familia.
-            </p>
-            
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="flex items-start gap-3">
-                <Wind className="w-6 h-6 text-emerald-600 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-stone-900">Clima Templado</h3>
-                  <p className="text-stone-600 text-sm">Veranos agradables todo el año</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <Mountain className="w-6 h-6 text-emerald-600 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-stone-900">Sierras Andinas</h3>
-                  <p className="text-stone-600 text-sm">Senderos para todos los niveles</p>
-                </div>
-              </div>
-            </div>
-            
-            <Link 
-              href="/about" 
-              className="inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-800 font-semibold"
-            >
-              Conoce más sobre nosotros
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-          
-          <div className="relative h-96 lg:h-[500px] rounded-2xl overflow-hidden shadow-xl">
-            <Image
-              src="/about-image.jpg"
-              alt="Vista panorámica de Potrerillos"
-              fill
-              className="object-cover"
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
+  // Fetch data en paralelo
   try {
-    const [activitiesRes, micrositesRes] = await Promise.all([
+    const [activitiesRes, micrositesRes, eventsRes, bannersRes, welcomeRes] = await Promise.all([
       getActivities({ limit: 6 }),
       getMicrosites({ featured: true, limit: 3 }),
+      getEvents({ upcoming: true, limit: 3 }),
+      getBanners('home-hero'),
+      getWelcomeSection(),
     ]);
 
-    const activities: StrapiEntity<Activity>[] = activitiesRes.data || [];
-    const microsites: StrapiEntity<Microsite>[] = micrositesRes.data || [];
+    const activities = activitiesRes.data || [];
+    
+    const microsites = micrositesRes.data || [];
+    const events = eventsRes.data || [];
+    const banners = bannersRes.data || [];
+    const welcome = welcomeRes?.data || {};
+    console.log(welcomeRes);
+    console.log(activities)
 
     return (
-      <div className="min-h-screen bg-stone-50">
-        {/* Hero Full Height */}
-        <HeroSection />
+      <div className="min-h-screen">
+        {/* <HeroSection banner={banners[0]} /> */}
 
-        {/* Stats Bar */}
-        <StatsBar />
-
-        {/* Sobre Potrerillos */}
-        <AboutSection />
-
+        {welcome?.active && <WelcomeSection data={welcome} />}
+        
+        <QuickSearch />
+        
         {/* Actividades */}
-        <section id="actividades" className="py-20 bg-white">
+        <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-16">
-              <span className="text-emerald-700 font-semibold text-sm uppercase tracking-wider">
-                Qué Hacer
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mt-2 mb-4">
-                Experiencias en la Naturaleza
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Actividades Destacadas
               </h2>
-              <p className="text-xl text-stone-600 max-w-3xl">
-                Descubre actividades diseñadas para conectar con la naturaleza y disfrutar de este paraíso mENDocino
+              <p className="text-xl text-gray-600">
+                Descubre las mejores experiencias en Potrerillos
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {activities.slice(0, 6).map((activity) => (
-                <div key={activity.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  <div className="relative h-56">
-                    {activity.attributes.featured_image?.attributes ? (
-                      <Image
-                        src={getStrapiImageUrl(activity.attributes.featured_image.attributes.url)}
-                        alt={activity.attributes.name}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-full" />
-                    )}
-                    <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold capitalize">
-                      {activity.attributes.category}
-                    </div>
-                  </div>
-                  
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-xl font-bold text-stone-900">{activity.attributes.name}</h3>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-sm font-medium">4.8</span>
-                      </div>
-                    </div>
-                    
-                    <p className="text-stone-600 mb-4 line-clamp-2">
-                      {activity.attributes.description}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {activity.attributes.duration && (
-                        <div className="flex items-center gap-1 text-sm text-stone-600">
-                          <Clock className="w-4 h-4" />
-                          {activity.attributes.duration}hs
-                        </div>
-                      )}
-                      {activity.attributes.location && (
-                        <div className="flex items-center gap-1 text-sm text-stone-600">
-                          <MapPin className="w-4 h-4" />
-                          {activity.attributes.location}
-                        </div>
-                      )}
-                      {activity.attributes.price_from && (
-                        <div className="text-sm font-semibold text-emerald-700">
-                          desde ${activity.attributes.price_from}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <Link 
-                      href={`/activities/${activity.attributes.slug}`}
-                      className="w-full inline-flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                    >
-                      Ver Detalles
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
+            {activities.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {activities.map((activity: any) => (
+                    //console.log('Rendering Activity:', activity),
+                    <ActivityCard key={activity.id} activity={activity} />
+                  ))}
                 </div>
-              ))}
-            </div>
-
-            <div className="text-center mt-12">
-              <Link 
-                href="/activities" 
-                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-8 rounded-full transition-colors"
-              >
-                Ver Todas las Actividades
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Micrositios Destacados */}
-        <section className="py-20 bg-stone-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-16 text-center">
-              <span className="text-emerald-700 font-semibold text-sm uppercase tracking-wider">
-                Alojamientos & Experiencias
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mt-2 mb-4">
-                Micrositios Destacados
-              </h2>
-              <p className="text-xl text-stone-600 max-w-3xl mx-auto">
-                Descubre alojamientos, restaurantes y proveedores locales certificados
+                <div className="text-center mt-12">
+                  <Link
+                    href="/actividades"
+                    className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                  >
+                    Ver Todas las Actividades
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <p className="text-center text-gray-600">
+                Próximamente actividades disponibles
               </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {microsites.slice(0, 3).map((microsite) => (
-                <div key={microsite.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  <div className="relative h-48">
-                    {microsite.attributes.image?.attributes ? (
-                      <Image
-                        src={getStrapiImageUrl(microsite.attributes.image.attributes.url)}
-                        alt={microsite.attributes.title}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-full" />
-                    )}
-                    {microsite.attributes.featured && (
-                      <div className="absolute top-4 left-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        Destacado
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-stone-900 mb-2">{microsite.attributes.title}</h3>
-                    <p className="text-stone-600 mb-4 line-clamp-2">
-                      {microsite.attributes.description}
-                    </p>
-                    
-                    <Link 
-                      href={`/microsites/${microsite.attributes.slug}`}
-                      className="inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-800 font-semibold"
-                    >
-                      Ver Micrositio
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
+            )}
           </div>
         </section>
 
-        {/* CTA Final */}
-        <section className="py-20 bg-gradient-to-r from-emerald-700 to-teal-800 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              ¿Listo para tu aventura?
+        {/* Micrositios */}
+        {microsites.length > 0 && (
+          <section className="py-16 bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Emprendimientos Destacados
+                </h2>
+                <p className="text-xl text-gray-600">
+                  Conoce nuestros partners premium
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {microsites.map((microsite: any) => (
+                  <MicrositeCard key={microsite.id} microsite={microsite} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Eventos */}
+        {events.length > 0 && (
+          <section className="py-16 bg-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Próximos Eventos
+                </h2>
+                <p className="text-xl text-gray-600">
+                  No te pierdas estas experiencias únicas
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {events.map((event: any) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* CTA */}
+        <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-4xl font-bold mb-6">
+              ¿Listo para tu Aventura en Potrerillos?
             </h2>
-            <p className="text-xl mb-10 max-w-3xl mx-auto text-emerald-100">
-              Descubre todas las actividades, alojamientos y experiencias que Potrerillos tiene para ofrecerte
+            <p className="text-xl mb-8 text-blue-100">
+              Explora todas las actividades, alojamientos y servicios disponibles
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link 
-                href="/activities" 
-                className="inline-flex items-center justify-center gap-2 bg-white text-emerald-700 hover:bg-stone-100 font-semibold py-4 px-8 rounded-full transition-colors"
+              <Link
+                href="/actividades"
+                className="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold"
               >
-                Explorar Actividades
-                <Compass className="w-5 h-5" />
+                Ver Actividades
               </Link>
-              <Link 
-                href="/microsites" 
-                className="inline-flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white hover:bg-white/10 font-semibold py-4 px-8 rounded-full transition-colors"
+              <Link
+                href="/alojamiento"
+                className="bg-blue-700 text-white px-8 py-3 rounded-lg hover:bg-blue-800 transition-colors font-semibold border-2 border-white"
               >
-                Ver Micrositios
-                <Info className="w-5 h-5" />
+                Buscar Alojamiento
               </Link>
             </div>
           </div>
@@ -330,7 +143,165 @@ export default async function Home() {
       </div>
     );
   } catch (error) {
-    console.error("Error loading homepage:", error);
-    return <ErrorComponent />;
+    console.error('Error loading home data:', error);
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Error al cargar el contenido
+          </h1>
+          <p className="text-gray-600">
+            Por favor, intenta nuevamente más tarde
+          </p>
+        </div>
+      </div>
+    );
   }
+}
+
+function HeroSection({ banner }: { banner?: any }) {
+  return (
+    <div className="relative h-[600px] bg-gradient-to-r from-blue-900 to-blue-700">
+      <div className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center opacity-30"></div>
+      <div className="relative z-10 h-full flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            Bienvenido al<br />
+            Dique Potrerillos
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-2xl">
+            Deportes acuáticos, trekking, aventura y naturaleza a solo 60km de Mendoza
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link
+              href="/actividades"
+              className="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors font-semibold text-center"
+            >
+              Explorar Actividades
+            </Link>
+            <Link
+              href="/informacion"
+              className="bg-blue-800 bg-opacity-50 backdrop-blur-sm text-white px-8 py-4 rounded-lg hover:bg-opacity-70 transition-colors font-semibold text-center border-2 border-white"
+            >
+              Cómo Llegar
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuickSearch() {
+  return (
+    <div className="bg-white shadow-lg -mt-16 relative z-20 max-w-5xl mx-4 sm:mx-auto rounded-lg p-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <select className="border border-gray-300 rounded-lg px-4 py-2">
+          <option>Todas las actividades</option>
+          <option>Deportes de Agua</option>
+          <option>Montaña</option>
+        </select>
+        <select className="border border-gray-300 rounded-lg px-4 py-2">
+          <option>Todas las dificultades</option>
+          <option>Fácil</option>
+          <option>Moderado</option>
+        </select>
+        <select className="border border-gray-300 rounded-lg px-4 py-2">
+          <option>Cualquier duración</option>
+          <option>1-2 horas</option>
+          <option>3-4 horas</option>
+        </select>
+        <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-semibold">
+          Buscar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ActivityCard({ activity }: { activity: any }) {
+  const  attributes  = activity;
+  //console.log('Activity Attributes:', activity, attributes);
+ const imageUrl = attributes?.featured_image?.url
+  ? getStrapiImageUrl(attributes.featured_image.url)
+  : '/images/placeholder.jpg'; // Imagen por defecto
+ console.log('Activity Image URL:', imageUrl);
+  return (
+    <Link href={`/actividades/${attributes?.slug}`}>
+      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+        <div className="relative h-48 bg-gray-200">
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt={attributes?.name}
+              fill
+              className="object-cover"
+            />
+          )}
+        </div>
+        <div className="p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {attributes?.name}
+          </h3>
+          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+            {attributes?.duration && (
+              <span className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                {attributes?.duration}h
+              </span>
+            )}
+            {attributes?.location && (
+              <span className="flex items-center gap-1">
+                <MapPin className="w-4 h-4" />
+                {attributes?.location}
+              </span>
+            )}
+          </div>
+          {attributes?.price_from && (
+            <div className="text-lg font-bold text-blue-600">
+              Desde ${attributes?.price_from.toLocaleString()}
+            </div>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function MicrositeCard({ microsite }: { microsite: any }) {
+  const { attributes } = microsite;
+  return (
+    <Link href={`/emprendimientos/${attributes.slug}`}>
+      <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition-shadow">
+        <h3 className="text-xl font-semibold mb-2">{attributes.name}</h3>
+        {attributes.subscription_plan === 'premium' && (
+          <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
+            <Star className="w-4 h-4" />
+            Premium
+          </span>
+        )}
+      </div>
+    </Link>
+  );
+}
+
+function EventCard({ event }: { event: any }) {
+  const { attributes } = event;
+  const eventDate = attributes?.event_date ? new Date(attributes.event_date) : null;
+  const formattedDate = eventDate ? eventDate.toLocaleDateString('es-AR', {
+    day: 'numeric',
+    month: 'long'
+  }) : '';
+
+  return (formattedDate && attributes?.title &&
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="flex items-center gap-2 text-blue-600 text-sm font-semibold mb-2">
+        <Calendar className="w-4 h-4" />
+        {formattedDate}
+      </div>
+      <h3 className="text-xl font-semibold text-gray-900">
+        {attributes?.title}
+      </h3>
+    </div>
+  );
 }

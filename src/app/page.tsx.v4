@@ -1,21 +1,25 @@
-import { getActivities, getMicrosites, getEvents, getBanners } from '@/lib/api';
+// app/page.tsx
+import { getActivities, getMicrosites, getEvents, getBanners, getWelcomeSection } from '@/lib/api';
 import { getStrapiImageUrl } from '@/lib/api/client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Mountain, MapPin, Clock, DollarSign, Calendar, ArrowRight, Star } from 'lucide-react';
+import { Mountain, Waves, Sun, Camera, MapPin, Calendar, ArrowRight, Clock } from 'lucide-react';
+import { WelcomeSection } from '@/components/WelcomeSection';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   // Fetch data en paralelo
   try {
-    const [activitiesRes, micrositesRes, eventsRes, bannersRes] = await Promise.all([
+    const [welcomeSectionRes, activitiesRes, micrositesRes, eventsRes, bannersRes] = await Promise.all([
+      getWelcomeSection(),
       getActivities({ limit: 6 }),
       getMicrosites({ featured: true, limit: 3 }),
       getEvents({ upcoming: true, limit: 3 }),
       getBanners('home-hero'),
     ]);
 
+    const welcomeSection = welcomeSectionRes?.data || null;
     const activities = activitiesRes.data || [];
     const microsites = micrositesRes.data || [];
     const events = eventsRes.data || [];
@@ -23,7 +27,13 @@ export default async function Home() {
 
     return (
       <div className="min-h-screen">
-        <HeroSection banner={banners[0]} />
+        {/* Hero Section - Usa WelcomeSection si está disponible, sino usa el HeroSection por defecto */}
+        {welcomeSection ? (
+          <WelcomeSection data={welcomeSection} />
+        ) : (
+          <HeroSection banner={banners[0]} />
+        )}
+        
         <QuickSearch />
         
         {/* Actividades */}
@@ -149,6 +159,19 @@ export default async function Home() {
   }
 }
 
+function getIcon(iconName: string) {
+  const icons: Record<string, JSX.Element> = {
+    mountain: <Mountain className="w-8 h-8" />,
+    waves: <Waves className="w-8 h-8" />,
+    sun: <Sun className="w-8 h-8" />,
+    camera: <Camera className="w-8 h-8" />,
+    map: <MapPin className="w-8 h-8" />,
+    calendar: <Calendar className="w-8 h-8" />,
+  };
+  
+  return icons[iconName.toLowerCase()] || <Star className="w-8 h-8" />;
+}
+
 function HeroSection({ banner }: { banner?: any }) {
   return (
     <div className="relative h-[600px] bg-gradient-to-r from-blue-900 to-blue-700">
@@ -210,19 +233,19 @@ function QuickSearch() {
 }
 
 function ActivityCard({ activity }: { activity: any }) {
-  const { attributes } = activity;
-  const imageUrl = attributes.featured_image?.data
-    ? getStrapiImageUrl(attributes.featured_image.data.attributes.url)
-    : null;
+  const attributes = activity;
+  const imageUrl = attributes?.featured_image?.url
+    ? getStrapiImageUrl(attributes.featured_image.url)
+    : '/images/placeholder.jpg';
 
   return (
-    <Link href={`/actividades/${attributes.slug}`}>
+    <Link href={`/actividades/${attributes?.slug}`}>
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
         <div className="relative h-48 bg-gray-200">
           {imageUrl && (
             <Image
               src={imageUrl}
-              alt={attributes.name}
+              alt={attributes?.name}
               fill
               className="object-cover"
             />
@@ -230,25 +253,25 @@ function ActivityCard({ activity }: { activity: any }) {
         </div>
         <div className="p-6">
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            {attributes.name}
+            {attributes?.name}
           </h3>
           <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-            {attributes.duration && (
+            {attributes?.duration && (
               <span className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
-                {attributes.duration}h
+                {attributes?.duration}h
               </span>
             )}
-            {attributes.location && (
+            {attributes?.location && (
               <span className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
-                {attributes.location}
+                {attributes?.location}
               </span>
             )}
           </div>
-          {attributes.price_from && (
+          {attributes?.price_from && (
             <div className="text-lg font-bold text-blue-600">
-              Desde ${attributes.price_from.toLocaleString()}
+              Desde ${attributes?.price_from.toLocaleString()}
             </div>
           )}
         </div>
@@ -276,20 +299,20 @@ function MicrositeCard({ microsite }: { microsite: any }) {
 
 function EventCard({ event }: { event: any }) {
   const { attributes } = event;
-  const eventDate = new Date(attributes.event_date);
-  const formattedDate = eventDate.toLocaleDateString('es-AR', {
+  const eventDate = attributes?.event_date ? new Date(attributes.event_date) : null;
+  const formattedDate = eventDate ? eventDate.toLocaleDateString('es-AR', {
     day: 'numeric',
     month: 'long'
-  });
+  }) : '';
 
-  return (
+  return (formattedDate && attributes?.title &&
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-center gap-2 text-blue-600 text-sm font-semibold mb-2">
         <Calendar className="w-4 h-4" />
         {formattedDate}
       </div>
       <h3 className="text-xl font-semibold text-gray-900">
-        {attributes.title}
+        {attributes?.title}
       </h3>
     </div>
   );
