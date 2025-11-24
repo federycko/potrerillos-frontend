@@ -9,6 +9,10 @@ npm ci
 
 # Build the static export
 # Since next.config.ts already has output: "export", we don't need next export
+
+export NEXT_CONFIG=next.config.cf.ts
+
+
 npm run build
 
 # Output directory verification
