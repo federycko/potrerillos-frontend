@@ -1,14 +1,18 @@
 #!/bin/bash
 echo "🚀 Building Next.js static site for Cloudflare Pages..."
 
-set -e
-set -o pipefail
-
 rm -rf .next out
 
 npm ci
 
-echo "👉 Using next.config.cf.ts"
-export NEXT_CONFIG=next.config.cf.ts
+export NEXT_CONFIG_OUTPUT=export
 
-NODE_OPTIONS="--trace-warnings" next build --verbose
+npx next build  # ← FIX IMPORTANTE
+
+if [ -d "out" ]; then
+  echo "✅ Build ready in 'out' directory:"
+  du -sh out
+else
+  echo "❌ Build failed: no 'out' directory found"
+  exit 1
+fi
