@@ -61,6 +61,7 @@ export interface Media {
 
 export interface Activity {
   name: string;
+  id: number;
   slug: string;
   description: string;
   category: string;
@@ -68,7 +69,7 @@ export interface Activity {
   duration?: number | null;
   price_from?: number | null;
   price_to?: number | null;
-  featured_image?: Media;
+  featured_image?: MediaFormat;
   gallery?: Media[];
   location?: string | null;
   highlights?: Record<string, unknown> | null;
@@ -105,10 +106,12 @@ export interface Accommodation {
 }
 
 export interface Microsite {
-  title: string;
+  name: string;
   slug: string;
   description: string;
   content: string;
+  logo: Media;
+  subscription_plan: string;
   featured: boolean;
   image?: Media;
   images?: Media[];
@@ -125,8 +128,15 @@ export interface Event {
   slug: string;
   description: string;
   content: string;
-  eventDate: string;
+  event_date: string;
+  end_date?: string | null;
   location?: string | null;
+  featured_image: Media;
+  gallery?: Media[];
+  price?: number | null;
+  is_free: boolean;
+  organizer?: string | null;
+  contact_info?: string | null;
   image?: Media;
   images?: Media[];
   published?: boolean;

@@ -1,7 +1,11 @@
 import Image from 'next/image';
 import { getStrapiImageUrl } from '@/lib/api/client';
+import { WelcomeSection as WelcomeSectionType } from '@/types';
 
-const WelcomeSection = ({ data }: { data: any }) => {
+interface Props {
+  data: WelcomeSectionType | null;
+}
+const WelcomeSection = ({ data }: Props) => {
   const backgroundImage = data?.backgroundImage?.[0]; // Get first image from array
   const imageUrl = backgroundImage?.url 
     ? getStrapiImageUrl(backgroundImage.url)

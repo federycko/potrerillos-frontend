@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import WelcomeSection  from '@/components/WelcomeSection';
 import { Mountain, MapPin, Clock, DollarSign, Calendar, ArrowRight, Star } from 'lucide-react';
+import { Activity, Microsite, StrapiEntity, Event, Banner } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,9 +51,9 @@ export default async function Home() {
             {activities.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {activities.map((activity: any) => (
+                  {activities.map(({ id, attributes: activity }: StrapiEntity<Activity>) => (
                     //console.log('Rendering Activity:', activity),
-                    <ActivityCard key={activity.id} activity={activity} />
+                    <ActivityCard key={id} activity={activity} />
                   ))}
                 </div>
                 <div className="text-center mt-12">
@@ -86,8 +87,8 @@ export default async function Home() {
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {microsites.map((microsite: any) => (
-                  <MicrositeCard key={microsite.id} microsite={microsite} />
+                {microsites.map(({ id, attributes: microsite }: StrapiEntity<Microsite>) => (
+                  <MicrositeCard key={id} microsite={microsite} />
                 ))}
               </div>
             </div>
@@ -107,8 +108,8 @@ export default async function Home() {
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {events.map((event: any) => (
-                  <EventCard key={event.id} event={event} />
+                {events.map(({ id, attributes: event }: StrapiEntity<Event>) => (
+                  <EventCard key={id} event={event} />
                 ))}
               </div>
             </div>
@@ -159,7 +160,7 @@ export default async function Home() {
   }
 }
 
-function HeroSection({ banner }: { banner?: any }) {
+function HeroSection({ banner }: { banner?: Banner }) {
   return (
     <div className="relative h-[600px] bg-gradient-to-r from-blue-900 to-blue-700">
       <div className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center opacity-30"></div>
@@ -219,7 +220,7 @@ function QuickSearch() {
   );
 }
 
-function ActivityCard({ activity }: { activity: any }) {
+function ActivityCard({ activity }: { activity: Activity }) {
   const  attributes  = activity;
   //console.log('Activity Attributes:', activity, attributes);
  const imageUrl = attributes?.featured_image?.url
@@ -268,8 +269,8 @@ function ActivityCard({ activity }: { activity: any }) {
   );
 }
 
-function MicrositeCard({ microsite }: { microsite: any }) {
-  const { attributes } = microsite;
+function MicrositeCard({ microsite }: { microsite: Microsite }) {
+  const  attributes = microsite;
   return (
     <Link href={`/emprendimientos/${attributes.slug}`}>
       <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition-shadow">
@@ -285,8 +286,8 @@ function MicrositeCard({ microsite }: { microsite: any }) {
   );
 }
 
-function EventCard({ event }: { event: any }) {
-  const { attributes } = event;
+function EventCard({ event }: { event: Event }) {
+  const attributes = event;
   const eventDate = attributes?.event_date ? new Date(attributes.event_date) : null;
   const formattedDate = eventDate ? eventDate.toLocaleDateString('es-AR', {
     day: 'numeric',
