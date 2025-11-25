@@ -24,7 +24,7 @@ export default async function Home() {
     const microsites = micrositesRes.data || [];
     const events = eventsRes.data || [];
     const banners = bannersRes.data || [];
-    const welcome = welcomeRes?.data || {};
+    const welcome = welcomeRes?.data || null;
     console.log(welcomeRes);
     console.log(activities)
 
@@ -32,7 +32,7 @@ export default async function Home() {
       <div className="min-h-screen">
         {/* <HeroSection banner={banners[0]} /> */}
 
-        {welcome?.active && <WelcomeSection data={welcome} />}
+        {welcome && welcome?.active && <WelcomeSection data={welcome} />}
         
         <QuickSearch />
         
