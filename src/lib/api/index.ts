@@ -202,7 +202,7 @@ export async function getWelcomeSection(locale: string = 'es'): Promise<WelcomeS
     );
     console.log('Welcome Section Data:', data);
     // Check if section is active
-    if (data?.active === false) {
+    if (data && data?.data?.active === false) {
       return null;
     }
     
