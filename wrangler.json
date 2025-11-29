@@ -6,6 +6,7 @@
   "vars": {
     "NEXT_PUBLIC_API_URL": "https://entrance-everyday-cooperative-islands.trycloudflare.com/api",
     "NEXT_PUBLIC_STRAPI_URL": "https://entrance-everyday-cooperative-islands.trycloudflare.com",
-    "NEXT_PUBLIC_SITE_URL": "https://potrerillos-frontend.pages.dev"
+    "NEXT_PUBLIC_SITE_URL": "https://potrerillos-frontend.pages.dev",
+    "NEXT_DYNAMIC_MODE": "force-static"
   }
 }
