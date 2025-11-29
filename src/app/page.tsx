@@ -5,8 +5,8 @@ import Link from 'next/link';
 import WelcomeSection  from '@/components/WelcomeSection';
 import { Mountain, MapPin, Clock, DollarSign, Calendar, ArrowRight, Star } from 'lucide-react';
 import { Activity, Microsite, StrapiEntity, Event, Banner } from '@/types';
-console.log(process.env.NEXT_DYNAMIC_MODE);
-export const dynamic = process.env.NEXT_DYNAMIC_MODE || 'force-static';
+
+export const dynamic = 'force-static';
 
 export default async function Home() {
   // Fetch data en paralelo
